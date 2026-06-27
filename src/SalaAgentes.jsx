@@ -363,6 +363,12 @@ export default function SalaAgentes() {
   const [loading, setLoading] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false); // lectura en voz alta de respuestas
   const scrollRef = useRef(null);
+  // Cada envío nuevo incrementa este número. Las respuestas en curso de un
+  // envío "viejo" chequean este valor antes de aplicarse, y si ya no
+  // coincide (porque el usuario mandó otro mensaje mientras esperaba),
+  // se descartan en silencio — así se puede "cortar" lo que estaban
+  // diciendo y mandar un mensaje nuevo en cualquier momento.
+  const turnIdRef = useRef(0);
 
   const handleVoiceResult = useCallback((text) => {
     setInput((prev) => (prev ? prev + " " + text : text));
@@ -397,7 +403,13 @@ export default function SalaAgentes() {
   }
 
   async function sendDirectMessage() {
-    if (!input.trim() || !activeAgent || loading) return;
+    if (!input.trim() || !activeAgent) return;
+    // Corta cualquier audio que esté sonando y "cancela" la espera anterior
+    // (su resultado se va a descartar solo cuando llegue, más abajo).
+    window.speechSynthesis?.cancel();
+    turnIdRef.current += 1;
+    const myTurn = turnIdRef.current;
+
     const agent = findAgent(activeAgent);
     const userMsg = { role: "user", content: input.trim() };
     const history = chats[activeAgent] || [];
@@ -407,12 +419,14 @@ export default function SalaAgentes() {
     setLoading(true);
     try {
       const reply = await callAgent(newHistory, agent.system);
+      if (turnIdRef.current !== myTurn) return; // se mandó otro mensaje mientras esperaba, descartar
       setChats((c) => ({
         ...c,
         [activeAgent]: [...newHistory, { role: "assistant", content: reply }],
       }));
       speak(reply, voiceEnabled);
     } catch (e) {
+      if (turnIdRef.current !== myTurn) return;
       setChats((c) => ({
         ...c,
         [activeAgent]: [
@@ -421,7 +435,7 @@ export default function SalaAgentes() {
         ],
       }));
     } finally {
-      setLoading(false);
+      if (turnIdRef.current === myTurn) setLoading(false);
     }
   }
 
@@ -430,7 +444,13 @@ export default function SalaAgentes() {
   // 2) si mencionás un piso ("piso de negocio", "legal", "creativo"...), responden los 4 de ese piso
   // 3) si no mencionás nada, 3 agentes random (de pisos distintos) opinan en cadena
   async function sendGroupMessage() {
-    if (!input.trim() || loading) return;
+    if (!input.trim()) return;
+    // Corta cualquier audio en curso y "cancela" la cadena de respuestas
+    // anterior — el loop de abajo va a parar solo en la próxima vuelta.
+    window.speechSynthesis?.cancel();
+    turnIdRef.current += 1;
+    const myTurn = turnIdRef.current;
+
     const topic = input.trim();
     setGroupChat((g) => [...g, { speaker: "user", content: topic }]);
     setInput("");
@@ -471,24 +491,32 @@ export default function SalaAgentes() {
     ];
 
     for (const agentId of panel) {
+      // Si mientras esperábamos la respuesta el usuario mandó otro mensaje
+      // (turnIdRef cambió), paramos la cadena acá — no seguimos con los
+      // agentes que faltaban responder.
+      if (turnIdRef.current !== myTurn) return;
+
       const agent = findAgent(agentId);
       const sys = agent.system + instruction;
       try {
         const reply = await callAgent(runningTranscript, sys);
+        if (turnIdRef.current !== myTurn) return;
         setGroupChat((g) => [...g, { speaker: agentId, content: reply }]);
         await speak(`${agent.name} dice: ${reply}`, voiceEnabled);
+        if (turnIdRef.current !== myTurn) return;
         runningTranscript = [
           ...runningTranscript,
           { role: "assistant", content: `${agent.name} (${agent.role}): ${reply}` },
         ];
       } catch (e) {
+        if (turnIdRef.current !== myTurn) return;
         setGroupChat((g) => [
           ...g,
           { speaker: agentId, content: "(no pudo conectarse)" },
         ]);
       }
     }
-    setLoading(false);
+    if (turnIdRef.current === myTurn) setLoading(false);
   }
 
   function pickPanel() {
@@ -693,7 +721,8 @@ export default function SalaAgentes() {
               )}
               <button
                 onClick={handleSend}
-                disabled={loading || !input.trim()}
+                disabled={!input.trim()}
+                title={loading ? "Cortar y mandar mensaje nuevo" : "Enviar"}
                 className="px-3 py-2 rounded-lg bg-[#b388ff] text-[#0b0d14] disabled:opacity-40"
               >
                 <Send size={16} />
