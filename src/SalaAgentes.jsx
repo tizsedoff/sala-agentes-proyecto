@@ -9,18 +9,35 @@ const FLOORS = [
     label: "Piso de Negocio",
     accent: "#f5a623",
     glow: "rgba(245,166,35,0.35)",
+    aliases: ["negocio", "negocios", "ventas"],
   },
   {
     id: "tecnico",
     label: "Piso Técnico",
     accent: "#3ecbe0",
     glow: "rgba(62,203,224,0.35)",
+    aliases: ["tecnico", "técnico", "tech", "desarrollo"],
   },
   {
     id: "mentores",
     label: "Piso de Mentores",
     accent: "#b388ff",
     glow: "rgba(179,136,255,0.35)",
+    aliases: ["mentores", "mentoria", "mentoría"],
+  },
+  {
+    id: "creativo",
+    label: "Piso Creativo",
+    accent: "#ff6fae",
+    glow: "rgba(255,111,174,0.35)",
+    aliases: ["creativo", "contenido", "redes", "marketing creativo"],
+  },
+  {
+    id: "legal",
+    label: "Piso Legal y Admin",
+    accent: "#7de37e",
+    glow: "rgba(125,227,126,0.35)",
+    aliases: ["legal", "admin", "administrativo", "impuestos", "facturacion", "facturación"],
   },
 ];
 
@@ -148,6 +165,88 @@ const AGENTS = [
     system:
       "Sos Bruno, agente Motivador. Hablás en español argentino, con energía pero sin ser exagerado ni vacío. Ayudás a mantener el envión cuando alguien está trabado o desmotivado, con consejos accionables, no solo frases lindas. Respuestas breves, máximo 4-5 oraciones salvo que te pidan más detalle.",
   },
+  // Creativo
+  {
+    id: "redes",
+    floor: "creativo",
+    name: "Mía",
+    role: "Redes Sociales",
+    desk: { x: 12, y: 50 },
+    avatar: "📱",
+    system:
+      "Sos Mía, agente de Redes Sociales. Hablás en español argentino, con onda y al día con tendencias. Ayudás a pensar ideas de posts, reels y cómo mostrar proyectos de portfolio en redes para conseguir clientes. Respuestas breves, máximo 4-5 oraciones salvo que te pidan más detalle.",
+  },
+  {
+    id: "copy",
+    floor: "creativo",
+    name: "Pedro",
+    role: "Copywriting",
+    desk: { x: 38, y: 50 },
+    avatar: "✍️",
+    system:
+      "Sos Pedro, agente de Copywriting. Hablás en español argentino, con buena pluma. Ayudás a escribir textos persuasivos para portfolios, presupuestos y mensajes a clientes, con un tono profesional pero cercano. Respuestas breves, máximo 4-5 oraciones salvo que te pidan más detalle o un texto armado.",
+  },
+  {
+    id: "branding",
+    floor: "creativo",
+    name: "Cata",
+    role: "Branding",
+    desk: { x: 64, y: 50 },
+    avatar: "🎯",
+    system:
+      "Sos Cata, agente de Branding. Hablás en español argentino, con criterio de identidad de marca. Ayudás a pensar nombres, logos, paletas y cómo posicionar una marca personal o de freelancer. Respuestas breves, máximo 4-5 oraciones salvo que te pidan más detalle.",
+  },
+  {
+    id: "visual",
+    floor: "creativo",
+    name: "Facu",
+    role: "Presentación Visual",
+    desk: { x: 88, y: 50 },
+    avatar: "📸",
+    system:
+      "Sos Facu, agente de Presentación Visual. Hablás en español argentino, con ojo para mockups y capturas. Ayudás a pensar cómo mostrar mejor un proyecto en un portfolio: composición, mockups, antes/después. Respuestas breves, máximo 4-5 oraciones salvo que te pidan más detalle.",
+  },
+  // Legal y Admin
+  {
+    id: "facturacion",
+    floor: "legal",
+    name: "Marisa",
+    role: "Facturación",
+    desk: { x: 12, y: 50 },
+    avatar: "🧾",
+    system:
+      "Sos Marisa, agente de Facturación. Hablás en español argentino, clara y práctica. Ayudás a armar presupuestos para clientes, pensar cómo cobrar (anticipo, cuotas) y estructurar precios de proyectos freelance. Aclarás que no sos contadora ni asesora impositiva certificada cuando haga falta. Respuestas breves, máximo 4-5 oraciones salvo que te pidan más detalle.",
+  },
+  {
+    id: "impuestos",
+    floor: "legal",
+    name: "Gustavo",
+    role: "Monotributo e Impuestos",
+    desk: { x: 38, y: 50 },
+    avatar: "📋",
+    system:
+      "Sos Gustavo, agente de Monotributo e Impuestos (Argentina). Hablás en español argentino, calmo y didáctico. Das información general orientativa sobre monotributo, categorías y facturación para freelancers argentinos, aclarando siempre que no sos contador y que para decisiones formales conviene consultar a uno. Respuestas breves, máximo 4-5 oraciones salvo que te pidan más detalle.",
+  },
+  {
+    id: "contratos",
+    floor: "legal",
+    name: "Lucía",
+    role: "Contratos y Acuerdos",
+    desk: { x: 64, y: 50 },
+    avatar: "📝",
+    system:
+      "Sos Lucía, agente de Contratos y Acuerdos. Hablás en español argentino, prolija y precisa. Ayudás a pensar qué incluir en un acuerdo con un cliente (alcance, plazos, pagos, revisiones), sin dar asesoramiento legal formal. Aclarás que no sos abogada cuando haga falta. Respuestas breves, máximo 4-5 oraciones salvo que te pidan más detalle.",
+  },
+  {
+    id: "proyectos",
+    floor: "legal",
+    name: "Nico",
+    role: "Gestión de Proyectos",
+    desk: { x: 88, y: 50 },
+    avatar: "🗂️",
+    system:
+      "Sos Nico, agente de Gestión de Proyectos. Hablás en español argentino, organizado y directo. Ayudás a planificar entregas, manejar varios clientes a la vez y armar cronogramas realistas para proyectos freelance. Respuestas breves, máximo 4-5 oraciones salvo que te pidan más detalle.",
+  },
 ];
 
 function normalizeText(text) {
@@ -165,6 +264,17 @@ function findMentionedAgent(text) {
     const regex = new RegExp(`\\b${name}\\b`);
     return regex.test(normalized);
   });
+}
+
+function findMentionedFloor(text) {
+  const normalized = normalizeText(text);
+  return FLOORS.find((f) =>
+    f.aliases.some((alias) => {
+      const a = normalizeText(alias);
+      const regex = new RegExp(`\\b${a}\\b`);
+      return regex.test(normalized);
+    })
+  );
 }
 
 function findAgent(id) {
@@ -315,8 +425,10 @@ export default function SalaAgentes() {
     }
   }
 
-  // Reunión grupal: si mencionás a un agente por nombre, responde solo él.
-  // Si no mencionás a nadie, 3 agentes random (uno por piso) opinan en cadena.
+  // Reunión grupal: prioridad de a quién responde:
+  // 1) si mencionás a un agente por nombre, responde solo él
+  // 2) si mencionás un piso ("piso de negocio", "legal", "creativo"...), responden los 4 de ese piso
+  // 3) si no mencionás nada, 3 agentes random (de pisos distintos) opinan en cadena
   async function sendGroupMessage() {
     if (!input.trim() || loading) return;
     const topic = input.trim();
@@ -324,17 +436,30 @@ export default function SalaAgentes() {
     setInput("");
     setLoading(true);
 
-    const mentioned = findMentionedAgent(topic);
-    const panel = mentioned ? [mentioned.id] : pickPanel();
+    const mentionedAgent = findMentionedAgent(topic);
+    const mentionedFloor = !mentionedAgent ? findMentionedFloor(topic) : null;
+
+    let panel;
+    let instruction;
+    if (mentionedAgent) {
+      panel = [mentionedAgent.id];
+      instruction =
+        " Te están hablando directamente a vos en una reunión grupal. Respondé como si te hubieran nombrado/consultado a vos en particular.";
+    } else if (mentionedFloor) {
+      panel = AGENTS.filter((a) => a.floor === mentionedFloor.id).map((a) => a.id);
+      instruction =
+        " Te convocaron a vos y a tu piso/equipo en particular para una reunión grupal. Vas a ver lo que dijeron tus compañeros de piso antes que vos; podés responderles o sumar tu visión, sin repetir lo mismo. Sé breve (2-4 oraciones).";
+    } else {
+      panel = pickPanel();
+      instruction =
+        " Estás en una reunión grupal con otros agentes IA de distintos pisos. Vas a ver lo que dijeron los compañeros antes que vos en la conversación; podés responderles o aportar tu visión del tema, pero sin repetir lo mismo que ya se dijo. Sé breve (2-4 oraciones).";
+    }
+
     let runningTranscript = [{ role: "user", content: `Tema de la reunión: "${topic}"` }];
 
     for (const agentId of panel) {
       const agent = findAgent(agentId);
-      const sys =
-        agent.system +
-        (mentioned
-          ? " Te están hablando directamente a vos en una reunión grupal. Respondé como si te hubieran nombrado/consultado a vos en particular."
-          : " Estás en una reunión grupal con otros agentes IA. Vas a ver lo que dijeron los compañeros antes que vos en la conversación; podés responderles o aportar tu visión del tema, pero sin repetir lo mismo que ya se dijo. Sé breve (2-4 oraciones).");
+      const sys = agent.system + instruction;
       try {
         const reply = await callAgent(runningTranscript, sys);
         setGroupChat((g) => [...g, { speaker: agentId, content: reply }]);
@@ -354,11 +479,13 @@ export default function SalaAgentes() {
   }
 
   function pickPanel() {
-    // Elegimos 3 agentes de distintos pisos para variedad
-    const byFloor = FLOORS.map((f) =>
-      AGENTS.filter((a) => a.floor === f.id)
-    );
-    return byFloor.map((list) => list[Math.floor(Math.random() * list.length)].id);
+    // Elegimos 3 pisos al azar (entre los 5) y 1 agente random de cada uno
+    const shuffledFloors = [...FLOORS].sort(() => Math.random() - 0.5);
+    const chosenFloors = shuffledFloors.slice(0, 3);
+    return chosenFloors.map((f) => {
+      const list = AGENTS.filter((a) => a.floor === f.id);
+      return list[Math.floor(Math.random() * list.length)].id;
+    });
   }
 
   function openGroup() {
@@ -480,7 +607,7 @@ export default function SalaAgentes() {
               {groupMode ? (
                 groupChat.length === 0 ? (
                   <p className="text-sm text-[#8b8aa0] text-center mt-8">
-                    Escribí un tema y 3 agentes de pisos distintos van a opinar. O mencioná a alguien por su nombre (ej: "Nora, ¿qué pensás de...?") y te responde solo esa persona.
+                    Escribí un tema y 3 agentes de pisos distintos van a opinar. Mencioná a alguien por su nombre (ej: "Nora, ¿qué pensás de...?") para que responda solo esa persona, o nombrá un piso (ej: "el piso de legal, ¿cómo armo un presupuesto?") para que responda todo ese equipo.
                   </p>
                 ) : (
                   groupChat.map((m, i) =>
@@ -533,7 +660,7 @@ export default function SalaAgentes() {
                   listening
                     ? "Escuchando..."
                     : groupMode
-                    ? "Tema para debatir, o mencioná a alguien (ej: Nora, ¿qué pensás de...?)"
+                    ? "Tema, mencioná a alguien, o nombrá un piso (ej: legal, creativo...)"
                     : "Escribí tu mensaje..."
                 }
                 className="flex-1 bg-[#13151f] border border-[#1f2333] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#b388ff]"
