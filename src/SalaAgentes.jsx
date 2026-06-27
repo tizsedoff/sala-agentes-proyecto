@@ -444,18 +444,31 @@ export default function SalaAgentes() {
     if (mentionedAgent) {
       panel = [mentionedAgent.id];
       instruction =
-        " Te están hablando directamente a vos en una reunión grupal. Respondé como si te hubieran nombrado/consultado a vos en particular.";
+        " Te están hablando directamente a vos en una reunión grupal. Respondé como si te hubieran nombrado/consultado a vos en particular, teniendo en cuenta todo lo charlado antes en la conversación.";
     } else if (mentionedFloor) {
       panel = AGENTS.filter((a) => a.floor === mentionedFloor.id).map((a) => a.id);
       instruction =
-        " Te convocaron a vos y a tu piso/equipo en particular para una reunión grupal. Vas a ver lo que dijeron tus compañeros de piso antes que vos; podés responderles o sumar tu visión, sin repetir lo mismo. Sé breve (2-4 oraciones).";
+        " Te convocaron a vos y a tu piso/equipo en particular para una reunión grupal. Vas a ver lo que se habló antes (de otros agentes y del usuario); podés responder, sumar tu visión o referirte a cosas dichas antes, sin repetir lo mismo. Sé breve (2-4 oraciones).";
     } else {
       panel = pickPanel();
       instruction =
-        " Estás en una reunión grupal con otros agentes IA de distintos pisos. Vas a ver lo que dijeron los compañeros antes que vos en la conversación; podés responderles o aportar tu visión del tema, pero sin repetir lo mismo que ya se dijo. Sé breve (2-4 oraciones).";
+        " Estás en una reunión grupal con otros agentes IA de distintos pisos. Vas a ver todo lo que se habló antes en la conversación (de otros agentes y del usuario); podés responder, referirte a eso, o aportar tu visión del tema nuevo, pero sin repetir lo mismo que ya se dijo. Sé breve (2-4 oraciones).";
     }
 
-    let runningTranscript = [{ role: "user", content: `Tema de la reunión: "${topic}"` }];
+    // Construye el historial completo de la reunión (todo lo dicho antes,
+    // no solo el mensaje nuevo) para que los agentes tengan memoria real
+    // de la conversación grupal, no solo del último turno.
+    let runningTranscript = [
+      ...groupChat.map((m) =>
+        m.speaker === "user"
+          ? { role: "user", content: m.content }
+          : {
+              role: "assistant",
+              content: `${findAgent(m.speaker).name} (${findAgent(m.speaker).role}): ${m.content}`,
+            }
+      ),
+      { role: "user", content: topic },
+    ];
 
     for (const agentId of panel) {
       const agent = findAgent(agentId);
