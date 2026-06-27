@@ -16,13 +16,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Faltan los mensajes" });
   }
 
-  // DIAGNÓSTICO TEMPORAL — borrar esta línea después de resolver el bug
-  console.log(
-    "DEBUG GROQ_API_KEY existe:",
-    !!process.env.GROQ_API_KEY,
-    "longitud:",
-    process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.length : 0
-  );
 
   // Groq usa el formato estilo OpenAI: el "system" va como un mensaje más
   // dentro del array, con role: "system", al principio de todo.

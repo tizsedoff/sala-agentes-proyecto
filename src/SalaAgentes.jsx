@@ -150,6 +150,23 @@ const AGENTS = [
   },
 ];
 
+function normalizeText(text) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, ""); // sacar acentos
+}
+
+function findMentionedAgent(text) {
+  const normalized = normalizeText(text);
+  return AGENTS.find((a) => {
+    const name = normalizeText(a.name);
+    // Busca el nombre como palabra completa (no como substring suelto)
+    const regex = new RegExp(`\\b${name}\\b`);
+    return regex.test(normalized);
+  });
+}
+
 function findAgent(id) {
   return AGENTS.find((a) => a.id === id);
 }
@@ -298,7 +315,8 @@ export default function SalaAgentes() {
     }
   }
 
-  // Reunión grupal: el usuario tira un tema, 3 agentes random opinan en cadena
+  // Reunión grupal: si mencionás a un agente por nombre, responde solo él.
+  // Si no mencionás a nadie, 3 agentes random (uno por piso) opinan en cadena.
   async function sendGroupMessage() {
     if (!input.trim() || loading) return;
     const topic = input.trim();
@@ -306,14 +324,17 @@ export default function SalaAgentes() {
     setInput("");
     setLoading(true);
 
-    const panel = pickPanel();
+    const mentioned = findMentionedAgent(topic);
+    const panel = mentioned ? [mentioned.id] : pickPanel();
     let runningTranscript = [{ role: "user", content: `Tema de la reunión: "${topic}"` }];
 
     for (const agentId of panel) {
       const agent = findAgent(agentId);
       const sys =
         agent.system +
-        " Estás en una reunión grupal con otros agentes IA. Vas a ver lo que dijeron los compañeros antes que vos en la conversación; podés responderles o aportar tu visión del tema, pero sin repetir lo mismo que ya se dijo. Sé breve (2-4 oraciones).";
+        (mentioned
+          ? " Te están hablando directamente a vos en una reunión grupal. Respondé como si te hubieran nombrado/consultado a vos en particular."
+          : " Estás en una reunión grupal con otros agentes IA. Vas a ver lo que dijeron los compañeros antes que vos en la conversación; podés responderles o aportar tu visión del tema, pero sin repetir lo mismo que ya se dijo. Sé breve (2-4 oraciones).");
       try {
         const reply = await callAgent(runningTranscript, sys);
         setGroupChat((g) => [...g, { speaker: agentId, content: reply }]);
@@ -459,7 +480,7 @@ export default function SalaAgentes() {
               {groupMode ? (
                 groupChat.length === 0 ? (
                   <p className="text-sm text-[#8b8aa0] text-center mt-8">
-                    Escribí un tema y convocá a la sala. Tres agentes de pisos distintos van a opinar.
+                    Escribí un tema y 3 agentes de pisos distintos van a opinar. O mencioná a alguien por su nombre (ej: "Nora, ¿qué pensás de...?") y te responde solo esa persona.
                   </p>
                 ) : (
                   groupChat.map((m, i) =>
@@ -512,7 +533,7 @@ export default function SalaAgentes() {
                   listening
                     ? "Escuchando..."
                     : groupMode
-                    ? "Tema para debatir..."
+                    ? "Tema para debatir, o mencioná a alguien (ej: Nora, ¿qué pensás de...?)"
                     : "Escribí tu mensaje..."
                 }
                 className="flex-1 bg-[#13151f] border border-[#1f2333] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#b388ff]"
